@@ -1,0 +1,7 @@
+{
+    "bounds": [[[60, 190], [60, 310], [150, 310], [150, 190]]],
+    "img_color": "GRAY",
+    "mode": "cv2.TM_CCORR_NORMED",
+    "threshold": 0.99,
+    "legend_color": [255, 255, 0, 0]
+}
