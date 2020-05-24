@@ -31,11 +31,13 @@ def import_images(path):
                 file_format = f2.split(".")[-1].lower()
                 if(isfile(file_path) and file_format == 'png'):
                     img = cv2.imread(file_path, flags=cv2.IMREAD_UNCHANGED)
-                    images_in_dir['images'][file_name] = cv2.cvtColor(img, images_in_dir['img_color'])
+                    images_in_dir['images'][file_name] = img
             images[f1] = images_in_dir
     return images
 
 cv2.namedWindow('window')
+# cv2.namedWindow('window2')
+
 # cv2.resizeWindow('window', 400, 225)
 # # cv2.moveWindow('window', 950, 20)
 # cv2.imshow('window', np.zeros((504, 947, 3)))
@@ -50,15 +52,14 @@ if __name__ == "__main__":
     setupgame.StartGame() 
     while(True):
         with mss() as sct:
-            screen = np.array(sct.grab(monitor))
-            setupgame.StartDetection(screen, images)
-            # screen = cv2.cvtColor(screen, cv2.COLOR_BGRA2RGB)
+            screen = np.asarray(sct.grab(monitor))
+            entities = setupgame.start_detection(screen, images)
+            setupgame.draw_entities(screen, entities, images)
+            # screen = setupgame.region_of_interest(screen, [[800, 1],[960, 100]])
             cv2.imshow('window', screen)
-
             if(cv2.waitKey(25) & 0xFF == ord("q")):
                 cv2.destroyAllWindows()
                 break
-
         # if(timer<rand):
         #     timer+=1
         # else:

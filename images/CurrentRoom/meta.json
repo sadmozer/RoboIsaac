@@ -1,7 +1,8 @@
 {
-    "bounds": [[[800, 1], [800, 100], [960, 100], [960, 1]]],
-    "img_color": "GRAY",
-    "mode": "cv2.TM_CCOEFF_NORMED",
-    "threshold": 0.9999,
+    "name": "current_room",
+    "bounds": [[800, 1], [960, 100]],
+    "img_color": "BGR",
+    "mode": "cv2.TM_CCORR_NORMED",
+    "threshold": 0.999,
     "legend_color": [0, 255, 0, 0]
 }

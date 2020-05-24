@@ -1,6 +1,7 @@
 import subprocess, sys
 import numpy as np
 import cv2
+import time
 def StartGame():
     p = subprocess.Popen(["powershell.exe",
     "-ExecutionPolicy",
@@ -16,12 +17,15 @@ def StartGame():
         print(e)
 
 def region_of_interest(img, vertices):
-    mask = np.zeros_like(img)
-    cv2.fillPoly(mask, vertices, 255)
-    masked = cv2.bitwise_and(img, mask)
+    # mask = np.zeros_like(img)
+    # print(img.shape, mask.shape)
+    # cv2.fillPoly(mask, vertices, 255)
+    masked = img[vertices[0][1]:vertices[1][1], vertices[0][0]:vertices[1][0]]
+
     return masked
 
 def process(original_image, color):
+    # processed_img = original_image
     processed_img = cv2.cvtColor(original_image, color)
     # th1=50, th2=100 OTTIMO
     # processed_img = cv2.Canny(processed_img, threshold1=50, threshold2=100)
@@ -40,13 +44,15 @@ def detect_img(img, pattern, confidence, mode):
         top_left = max_loc
         bottom_right = (top_left[0] + dim[1], top_left[1] + dim[0])
         val = max_val
-    elif(mode in min_methods and min_val < 1-confidence):
+    elif(mode in min_methods and min_val < confidence):
         top_left = min_loc
         bottom_right = (top_left[0] + dim[1], top_left[1] + dim[0])
-        val = 1-min_val
+        val = min_val
     return top_left, bottom_right, val
 
-def StartDetection(screen, images):
+def start_detection(screen, images):
+    k=0
+    detected_entities = []
     for im in images:
         confidence = 0
         top_left = None
@@ -55,15 +61,70 @@ def StartDetection(screen, images):
         names = list(dict_imgs.keys())
         vals = list(dict_imgs.values())
         while(i < len(names) and not top_left):
-            processed_screen = process(screen, images[im]['img_color'])
-            processed_screen = region_of_interest(processed_screen, images[im]['bounds'])
+            processed_screen = region_of_interest(screen, images[im]['bounds'])
+            processed_screen = process(processed_screen, images[im]['img_color'])
             top_left, bottom_right, confidence = detect_img(
-                img=processed_screen, 
+                img=region_of_interest(screen, images[im]['bounds']),
                 pattern=vals[i],
                 confidence=images[im]['threshold'],
                 mode=images[im]['mode'])
             if(not top_left):
                 i+=1
-        if(i < len(names)):
-            cv2.rectangle(screen, top_left, bottom_right, images[im]['legend_color'], 1)
-            cv2.putText(screen, f"{names[i][:1]}:{confidence:.5f}", (top_left[0]-5, top_left[1]-3), cv2.FONT_HERSHEY_SIMPLEX, 0.3, images[im]['legend_color'], 1, cv2.LINE_AA)
+            else:
+                # print(f"{names[i]}:{processed_screen.shape}")
+                offset_x = images[im]['bounds'][0][0]
+                offset_y = images[im]['bounds'][0][1]
+                box_top_left = (top_left[0]+offset_x, top_left[1]+offset_y)
+                box_bottom_right = (bottom_right[0]+offset_x, bottom_right[1]+offset_y)
+                detected_entities.append({"box_top_left": box_top_left, "box_bottom_right": box_bottom_right, "img_name": im, "confidence": confidence})
+    return detected_entities
+
+def draw_entities(screen, entities, images):
+    k = 0
+    for e in entities:
+        img = images[e['img_name']]
+        cv2.rectangle(screen,
+            e['box_top_left'],
+            e['box_bottom_right'],
+            img['legend_color'], 
+            1)
+        cv2.putText(screen, 
+            f"{e['img_name']} {e['confidence']:.5f}",
+            (800, 400+k),
+            cv2.FONT_HERSHEY_SIMPLEX, 
+            0.3,
+            img['legend_color'], 
+            1, 
+            cv2.LINE_AA)
+        k+=8
+
+# https://www.reddit.com/r/bindingofisaac/comments/2ld3t1/psa_how_to_speed_up_rebirth_considerably_even_on/
+def check_screenshot_noise():
+
+    screen1 = np.asarray(sct.grab(monitor))
+    # screen1 = cv2.cvtColor(screen1, cv2.COLOR_BGRA2GRAY)
+    # screen1 = setupgame.region_of_interest(screen1, [[417, 3], [533, 85]])
+    PressKey(S)
+    time.sleep(0.1)
+    ReleaseKey(S)
+    time.sleep(1)
+    screen2 = np.asarray(sct.grab(monitor))
+    # screen2 = cv2.cvtColor(screen2, cv2.COLOR_BGRA2GRAY)
+    # screen2 = setupgame.region_of_interest(screen2, [[417, 3], [533, 85]])
+    pprint(np.array_equal(screen1, screen2))
+    a = []
+    noise_threshold = 0
+    screen1 = screen1.reshape((472000, 4))
+    screen2 = screen2.reshape((472000, 4))
+    for px1, px2 in zip(screen1, screen2):
+        trovato = False
+        for ch1, ch2 in zip(px1, px2):
+            if(abs(int(ch1)-int(ch2)) > noise_threshold):
+                trovato = True
+        if(trovato):
+            a.append((255, 255, 255, 255))
+        else:
+            a.append(px2)
+    screen3 = np.asarray(a, dtype=np.uint8).reshape((500, 944, 4))
+    # screen3 = cv2.fastNlMeansDenoising(screen3, None, 10, 41, 21)
+    return screen1, screen2, screen3
