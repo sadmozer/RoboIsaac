@@ -1,0 +1,8 @@
+{
+    "name": "explored_miniboss_room",
+    "bounds": [[800, 1], [960, 100]],
+    "img_color": "BGR",
+    "mode": "cv2.TM_CCORR_NORMED",
+    "threshold": 0.99999,
+    "legend_color": [150, 0, 200, 0]
+}

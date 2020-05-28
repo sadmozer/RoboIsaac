@@ -1,8 +1,8 @@
 {
-    "name": "unexplored_room",
+    "name": "explored_chest_room",
     "bounds": [[800, 1], [960, 100]],
     "img_color": "BGR",
     "mode": "cv2.TM_CCORR_NORMED",
-    "threshold": 0.9999,
-    "legend_color": [0, 0, 255, 0]
+    "threshold": 0.99999,
+    "legend_color": [0, 155, 255, 0]
 }

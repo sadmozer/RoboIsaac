@@ -22,6 +22,8 @@ EnableBloom=0
 ```
 Put it in the folder *C:\Program Files (x86)\Steam\steamapps\common\The Binding of Isaac Rebirth\resources*. Then change **MaxRenderScale to 1**, **VSync to 0** in *C:\Users\Nick\Documents\My Games\Binding of Isaac Afterbirth\options.ini*
 
+[Source](https://www.reddit.com/r/bindingofisaac/comments/2ld3t1/psa_how_to_speed_up_rebirth_considerably_even_on/)
+
 ---
 **ISSUE #3**:
 Screenshots done to the game window while the floor is Burning Basement are noisy.
