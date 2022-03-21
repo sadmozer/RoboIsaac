@@ -1,8 +1,8 @@
 {
     "name": "up_door",
-    "bounds": [[417, 1], [533, 85]],
+    "bounds": [[530, 30], [650, 140]],
     "img_color": "GRAY",
     "mode": "cv2.TM_CCOEFF_NORMED",
-    "threshold": 0.58,
+    "threshold": 0.6,
     "legend_color": [255, 255, 0, 0]
 }

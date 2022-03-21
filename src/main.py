@@ -1,16 +1,18 @@
 import numpy as np
-from PIL import ImageGrab
+# from PIL import ImageGrab
 import cv2
 import time
-import pyautogui
-from directkeys import PressKey, ReleaseKey, W, A, S, D
+# import pyautogui
+# from directkeys import PressKey, ReleaseKey, W, A, S, D
 from pprint import pprint
-import setupgame
+import setupgame as setupgame
 from os import listdir
 from os.path import isfile, join, isdir
 import random
 import json
-from mss import mss
+import mss
+import mss.tools
+import win32gui
 
 def import_images(path):
     images = {}
@@ -37,44 +39,68 @@ def import_images(path):
     return images
 
 cv2.namedWindow('window')
-# cv2.namedWindow('window2')
+offset_x = 2653
+offset_y = 20
+cv2.moveWindow('window', offset_x, offset_y)
 
-# cv2.resizeWindow('window', 400, 225)
-# # cv2.moveWindow('window', 950, 20)
-# cv2.imshow('window', np.zeros((504, 947, 3)))
 
-images = import_images('.\images')
-kkeys = [W, A, S, D]
-timer = 0
-rand = random.randint(0, 3)
-monitor = {"top": 33, "left": 9, "width": 944, "height": 500}
-map_check = False
+# nodemon --watch ../src -e py,ps1 --exec "python" main.py
 
-def action(key, times=1, sleep=1):
-    for i in range(times):
-        PressKey(key)
-        time.sleep(sleep)
-        ReleaseKey(key)
-        time.sleep(sleep)
 
+# width = 944
+# height = 500
+# top = 83
+# left = 139
+
+width = 1176
+height = 580
+top = 40
+left = 10
+
+
+# cv2.imshow('window', np.zeros((height + 4, width + 3, 3)))
+
+images = import_images('../images')
+# # kkeys = [W, A, S, D]
+# timer = 0
+# rand = random.randint(0, 3)
+# map_check = False
+
+# def action(key, times=1, sleep=1):
+#     for i in range(times):
+#         PressKey(key)
+#         time.sleep(sleep)
+#         ReleaseKey(key)
+#         time.sleep(sleep)
+
+hwnd = win32gui.FindWindow(None, "Binding of Isaac: Afterbirth") 
+window = win32gui.GetWindowText(hwnd)
 if __name__ == "__main__":
-    setupgame.set_game_window()
+    setupgame.set_game_window()   
     screen = None
     while(True):
-        with mss() as sct:
-            screen = np.asarray(sct.grab(monitor))
+        left, top, width, height = win32gui.GetWindowRect(hwnd)
+        width = width - left 
+        height = height - top
+        monitor = {"top": top + 38, "left": left+8, "width": width -16, "height": height -46}
+        # print(monitor)
+        with mss.mss() as sct:
+            sct_img = sct.grab(monitor)
+            screen = np.array(sct_img)
             entities = setupgame.start_detection(screen, images)
             # minimap = setupgame.generate_minimap(entities)
+            output = "output.png"
             setupgame.draw_entities(screen, entities, images)
-            # screen = setupgame.region_of_interest(screen, [[800, 1],[960, 100]])
-            # time.sleep(5)
-            # for i in range(5):
-            # action(W, 2, 0.125)
-            # action(D, 2, 0.195)
-            # action(S, 2, 0.125)
-            # action(A, 2, 0.195)
-            # action(S, 2, 0.165)
-            # action(D, 1, 0.125)
+    #         # screen = setupgame.region_of_interest(screen, [[800, 1],[960, 100]])
+    #         # time.sleep(5)
+    #         # for i in range(5):
+    #         # action(W, 2, 0.125)
+    #         # action(D, 2, 0.195)
+    #         # action(S, 2, 0.125)
+    #         # action(A, 2, 0.195)
+    #         # action(S, 2, 0.165)
+    #         # action(D, 1, 0.125)
+            mss.tools.to_png(sct_img.rgb, sct_img.size, output=output)
             cv2.imshow('window', screen)
             if(cv2.waitKey(25) & 0xFF == ord("q")):
                 cv2.destroyAllWindows()

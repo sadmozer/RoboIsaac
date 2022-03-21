@@ -1,6 +1,6 @@
 {
     "name": "current_chest_room",
-    "bounds": [[800, 1], [960, 100]],
+    "bounds": [[1065, 1], [1200, 100]],
     "img_color": "BGR",
     "mode": "cv2.TM_CCORR_NORMED",
     "threshold": 0.9999999,

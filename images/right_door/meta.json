@@ -1,6 +1,6 @@
 {
     "name": "right_door",
-    "bounds": [[800, 200], [890, 310]],
+    "bounds": [[920, 260], [1010, 380]],
     "img_color": "GRAY",
     "mode": "cv2.TM_CCOEFF_NORMED",
     "threshold": 0.6,

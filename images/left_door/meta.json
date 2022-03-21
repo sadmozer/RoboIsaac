@@ -1,6 +1,6 @@
 {
     "name": "left_door",
-    "bounds": [[60, 190], [150, 310]],
+    "bounds": [[180, 250], [270, 380]],
     "img_color": "GRAY",
     "mode": "cv2.TM_CCOEFF_NORMED",
     "threshold": 0.5,
